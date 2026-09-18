@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Warm wood / walnut brand palette */
+  --color-brand-50: #f6f4f1;
+  --color-brand-100: #e9e4dc;
+  --color-brand-200: #d5ccbd;
+  --color-brand-300: #b8a892;
+  --color-brand-400: #9c886c;
+  --color-brand-500: #826e53;
+  --color-brand-600: #675541;
+  --color-brand-700: #524435;
+  --color-brand-800: #40362b;
+  --color-brand-900: #2f2820;
+  --color-brand-950: #1c1813;
+
+  /* Brass/gold accent for highlights, badges and hover states */
+  --color-accent-300: #e5c886;
+  --color-accent-400: #d4af5f;
+  --color-accent-500: #c9a24b;
+  --color-accent-600: #a98433;
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Serif display font for large headings (loaded in layout.tsx) */
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+}
+
+/* Slow zoom used by hero and card imagery on hover */
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+.animate-kenburns {
+  animation: kenburns 8s ease-out forwards;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-kenburns {
+    animation: none;
+  }
+}

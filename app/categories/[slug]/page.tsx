@@ -1,0 +1,105 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+
+import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
+import { getActiveCategories } from "@/lib/queries/categories";
+import { getActiveProducts } from "@/lib/queries/products";
+import { ProductCard } from "@/components/products/ProductCard";
+
+// ISR: catalog data is public and cache-safe; admin edits appear within 60s.
+export const revalidate = 60;
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  return {
+    title: slug.charAt(0).toUpperCase() + slug.slice(1).replaceAll("-", " "),
+  };
+}
+
+export default async function CategoryPage({ params }: Props) {
+  const { slug } = await params;
+
+  const categories = await getActiveCategories();
+  const category = categories.find((c) => c.slug === slug) ?? null;
+
+  if (!category) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+          <h1 className="font-display text-3xl font-semibold text-stone-900">
+            Catégorie introuvable
+          </h1>
+          <p className="mt-2 text-stone-500">
+            Cette catégorie n&apos;existe pas ou n&apos;est plus disponible.
+          </p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const products = await getActiveProducts(category.id);
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+
+      <main className="flex-1">
+        {/* Hero banner with the category photo */}
+        <section className="relative flex min-h-[38svh] items-end overflow-hidden bg-brand-950">
+          {category.image_url ? (
+            <Image
+              src={category.image_url}
+              alt={category.name}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover opacity-60"
+            />
+          ) : null}
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/40 to-brand-950/10" />
+          <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-24 sm:px-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent-300">
+              Catégorie
+            </p>
+            <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              {category.name}
+            </h1>
+            {category.description && (
+              <p className="mt-3 max-w-2xl text-white/70">
+                {category.description}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
+          {products.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-12 text-center">
+              <p className="font-medium text-stone-900">
+                Aucun produit trouvé.
+              </p>
+              <p className="mt-1 text-sm text-stone-500">
+                Revenez bientôt, de nouvelles réalisations arrivent.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
