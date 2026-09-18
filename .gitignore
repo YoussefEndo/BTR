@@ -36,6 +36,18 @@ yarn-error.log*
 # vercel
 .vercel
 
+# supabase CLI local state (contains connection URLs / project refs)
+supabase/.temp/
+supabase/.branches/
+
+# local photo archives not used by the app
+/pic/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# misc editors / OS
+.vscode
+.idea
+Thumbs.db
