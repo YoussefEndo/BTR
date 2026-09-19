@@ -7,7 +7,7 @@ import { createOrder } from "@/app/actions/orders";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { validateCustomerFields, validateOptionValue } from "@/lib/validation/order";
 import type { OptionValue, Product, ProductImage, ProductOption } from "@/types/database";
-import { translate, type Locale } from "@/lib/i18n";
+import { catalogProductDescription, translate, type Locale } from "@/lib/i18n";
 
 interface Props {
   product: Product;
@@ -161,7 +161,7 @@ export function OrderForm({ product, images, options, locale }: Props) {
       <div>
         <h2 className="text-lg font-semibold text-stone-900">{translate(locale, "description")}</h2>
         <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-stone-600">
-          {product.description}
+          {catalogProductDescription(locale, product.description)}
         </p>
       </div>
 

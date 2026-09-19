@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { Category } from "@/types/database";
-import { translate, type Locale } from "@/lib/i18n";
+import { catalogCategory, catalogCategoryDescription, translate, type Locale } from "@/lib/i18n";
 
 export function CategoryCard({ category, locale }: { category: Category; locale: Locale }) {
+  const categoryName = catalogCategory(locale, category.slug, category.name);
+  const categoryDescription = catalogCategoryDescription(locale, category.slug, category.description);
   return (
     <Link
       href={`/categories/${category.slug}`}
@@ -13,7 +15,7 @@ export function CategoryCard({ category, locale }: { category: Category; locale:
       {category.image_url ? (
         <Image
           src={category.image_url}
-          alt={category.name}
+          alt={categoryName}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover opacity-80 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
@@ -25,11 +27,11 @@ export function CategoryCard({ category, locale }: { category: Category; locale:
 
       <div className="relative p-6">
         <h3 className="font-display text-2xl font-semibold text-white">
-          {category.name}
+          {categoryName}
         </h3>
-        {category.description && (
+        {categoryDescription && (
           <p className="mt-1 line-clamp-1 text-sm text-white/70">
-            {category.description}
+            {categoryDescription}
           </p>
         )}
         <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent-300">

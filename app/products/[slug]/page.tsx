@@ -6,7 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { OrderForm } from "@/components/order/OrderForm";
 import { getProductWithOptions } from "@/lib/queries/products";
-import { translate } from "@/lib/i18n";
+import { catalogProductName, translate } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
 // ISR: catalog data is public and cache-safe; admin edits appear within 60s.
@@ -40,6 +40,7 @@ export default async function ProductPage({ params }: Props) {
   if (!data) notFound();
 
   const { product, images, options } = data;
+  const productName = catalogProductName(locale, product.name);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -52,7 +53,7 @@ export default async function ProductPage({ params }: Props) {
           <span className="mx-2">/</span>
           <Link href="/products" className="hover:text-brand-700">{translate(locale, "products")}</Link>
           <span className="mx-2">/</span>
-          <span className="text-stone-600">{product.name}</span>
+          <span className="text-stone-600">{productName}</span>
         </nav>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
@@ -60,7 +61,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="order-2 space-y-8 lg:order-1">
             <div>
               <h1 className="text-3xl font-semibold tracking-tight text-stone-900">
-                {product.name}
+                {productName}
               </h1>
               <p className="mt-2 text-sm text-stone-400">
                 {translate(locale, "customManufacturing")}

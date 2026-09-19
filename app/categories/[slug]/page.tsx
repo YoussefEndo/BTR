@@ -6,7 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveProducts } from "@/lib/queries/products";
 import { ProductCard } from "@/components/products/ProductCard";
-import { translate } from "@/lib/i18n";
+import { catalogCategory, catalogCategoryDescription, translate } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
 // ISR: catalog data is public and cache-safe; admin edits appear within 60s.
@@ -48,6 +48,8 @@ export default async function CategoryPage({ params }: Props) {
   }
 
   const products = await getActiveProducts(category.id);
+  const categoryName = catalogCategory(locale, category.slug, category.name);
+  const categoryDescription = catalogCategoryDescription(locale, category.slug, category.description);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -59,7 +61,7 @@ export default async function CategoryPage({ params }: Props) {
           {category.image_url ? (
             <Image
               src={category.image_url}
-              alt={category.name}
+              alt={categoryName}
               fill
               priority
               sizes="100vw"
@@ -72,11 +74,11 @@ export default async function CategoryPage({ params }: Props) {
               {translate(locale, "category")}
             </p>
             <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-              {category.name}
+              {categoryName}
             </h1>
-            {category.description && (
+            {categoryDescription && (
               <p className="mt-3 max-w-2xl text-white/70">
-                {category.description}
+                {categoryDescription}
               </p>
             )}
           </div>

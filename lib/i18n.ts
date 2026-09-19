@@ -140,3 +140,67 @@ export function translate(locale: Locale, key: TranslationKey): string {
   return translations[locale][key];
 }
 
+const arabicCategories: Record<string, { name: string; description: string }> = {
+  tables: { name: "طاولات", description: "طاولات حسب الطلب لغرفة الطعام أو الصالون أو المكتب." },
+  placards: { name: "خزائن", description: "خزائن وغرف ملابس ملائمة لمساحتك." },
+  "meubles-tv": { name: "وحدات التلفاز", description: "وحدات تلفاز عصرية وعملية." },
+  bureaux: { name: "مكاتب", description: "مكاتب مريحة مصممة حسب مساحتك." },
+  cuisine: { name: "مطابخ", description: "مطابخ مجهزة حسب الطلب." },
+  autres: { name: "أخرى", description: "أثاث وتجهيزات مخصصة." },
+  "meubles-a-chaussures": { name: "خزائن الأحذية", description: "خزائن أحذية بأبواب مائلة وأدراج، مصنوعة حسب الطلب." },
+  "buffets-commodes": { name: "خزائن جانبية وأدراج", description: "خزائن جانبية وخزائن أدراج لكل غرف المنزل." },
+};
+
+const productNameReplacements: [RegExp, string][] = [
+  [/Meuble TV/gi, "وحدة تلفاز"],
+  [/Meuble à chaussures/gi, "خزانة أحذية"],
+  [/Table de chevet/gi, "طاولة سرير"],
+  [/Table basse/gi, "طاولة قهوة"],
+  [/Table à Manger/gi, "طاولة طعام"],
+  [/Table Console/gi, "طاولة كونسول"],
+  [/Table/gi, "طاولة"],
+  [/Placard/gi, "خزانة"],
+  [/Armoire/gi, "خزانة ملابس"],
+  [/Bureau/gi, "مكتب"],
+  [/Bibliothèque/gi, "مكتبة"],
+  [/Étagère/gi, "رفوف"],
+  [/Buffet/gi, "خزانة جانبية"],
+  [/Commode/gi, "خزانة أدراج"],
+  [/Cabinet d'angle/gi, "خزانة زاوية"],
+  [/Meuble d'entrée/gi, "خزانة مدخل"],
+  [/Petit meuble/gi, "خزانة صغيرة"],
+  [/Tête de lit/gi, "لوح رأس السرير"],
+  [/Cuisine/gi, "مطبخ"],
+  [/noyer/gi, "جوز"],
+  [/chêne/gi, "بلوط"],
+  [/blanc/gi, "أبيض"],
+  [/noir/gi, "أسود"],
+  [/crème/gi, "كريمي"],
+  [/bois/gi, "خشب"],
+  [/naturel/gi, "طبيعي"],
+  [/moderne/gi, "عصري"],
+  [/design/gi, "بتصميم أنيق"],
+  [/suspendu/gi, "معلق"],
+  [/flottant/gi, "معلق"],
+  [/avec/gi, "مع"],
+];
+
+export function catalogCategory(locale: Locale, slug: string, fallback: string): string {
+  return locale === "ar" ? arabicCategories[slug]?.name ?? fallback : fallback;
+}
+
+export function catalogCategoryDescription(locale: Locale, slug: string, fallback: string | null): string | null {
+  return locale === "ar" ? arabicCategories[slug]?.description ?? "أثاث وتجهيزات مصممة حسب الطلب." : fallback;
+}
+
+export function catalogProductName(locale: Locale, name: string): string {
+  if (locale !== "ar") return name;
+  return productNameReplacements.reduce((result, [pattern, replacement]) => result.replace(pattern, replacement), name);
+}
+
+export function catalogProductDescription(locale: Locale, description: string): string {
+  return locale === "ar"
+    ? "منتج مصنوع حسب الطلب بتصميم عملي وأنيق، مع إمكانية تخصيص الأبعاد والألوان والتشطيبات وفق احتياجاتك."
+    : description;
+}
+

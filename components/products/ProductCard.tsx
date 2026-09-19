@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { ProductWithCategory } from "@/types/database";
-import { translate, type Locale } from "@/lib/i18n";
+import { catalogCategory, catalogProductDescription, catalogProductName, translate, type Locale } from "@/lib/i18n";
 
 export function ProductCard({ product, locale }: { product: ProductWithCategory; locale: Locale }) {
+  const productName = catalogProductName(locale, product.name);
+  const productDescription = catalogProductDescription(locale, product.description);
   return (
     <Link
       href={`/products/${product.slug}`}
@@ -14,7 +16,7 @@ export function ProductCard({ product, locale }: { product: ProductWithCategory;
         {product.main_image_url ? (
           <Image
             src={product.main_image_url}
-            alt={product.name}
+            alt={productName}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -26,16 +28,16 @@ export function ProductCard({ product, locale }: { product: ProductWithCategory;
         )}
         {product.categories && (
           <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-brand-800 backdrop-blur-sm">
-            {product.categories.name}
+            {catalogCategory(locale, product.categories.slug, product.categories.name)}
           </span>
         )}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <h3 className="text-base font-semibold text-stone-900">
-          {product.name}
+          {productName}
         </h3>
         <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-stone-500">
-          {product.description}
+          {productDescription}
         </p>
         <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700">
           {translate(locale, "seeDetails")}
