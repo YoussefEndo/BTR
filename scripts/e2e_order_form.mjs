@@ -10,7 +10,7 @@
 import puppeteer from "puppeteer-core";
 
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
-const BASE = "http://localhost:3001";
+const BASE = "http://localhost:3000";
 const SLUG = "meuble-tv-flottant-noyer"; // seed 0005 product
 const MARKER = "E2E-TEST Client";
 
@@ -39,20 +39,25 @@ try {
   });
 
   // --- 1. Home renders (SSR data from live Supabase) ---
-  await page.goto(BASE + "/", { waitUntil: "networkidle2", timeout: 45000 });
+  await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 45000 });
   const homeText = await page.evaluate(() => document.body.innerText);
-  const homeOk = homeText.includes("Votre intérieur") && homeText.includes("Nos catégories");
+  const homeOk = homeText.includes("Votre intérieur") && homeText.includes("Explorez nos catégories");
 
   // --- 2. Product page with dynamic options ---
   let resp = await page.goto(`${BASE}/products/${SLUG}`, {
-    waitUntil: "networkidle2",
+    waitUntil: "domcontentloaded",
     timeout: 45000,
   });
+  // Wait for React to hydrate before interacting (domcontentloaded fires way
+  // before Next.js attaches event handlers; typing before that is lost).
+  await page.waitForSelector("form", { timeout: 15000 });
+  await page.waitForFunction(() => document.readyState === "complete", { timeout: 15000 });
+  await new Promise((r) => setTimeout(r, 1500));
   let productOk = resp.status() === 200;
   let bodyText = productOk ? await page.evaluate(() => document.body.innerText) : "";
   if (!productOk || bodyText.includes("Produit introuvable")) {
     // Fallback: first product link on /products
-    await page.goto(BASE + "/products", { waitUntil: "networkidle2", timeout: 45000 });
+    await page.goto(BASE + "/products", { waitUntil: "domcontentloaded", timeout: 45000 });
     const href = await page.evaluate(() => {
       const a = [...document.querySelectorAll('a[href^="/products/"]')].find(
         (x) => x.getAttribute("href") !== "/products"
@@ -63,7 +68,7 @@ try {
       out({ fatal: "no product link found on /products", consoleErrors, failedRequests });
       process.exit(1);
     }
-    resp = await page.goto(BASE + href, { waitUntil: "networkidle2", timeout: 45000 });
+    resp = await page.goto(BASE + href, { waitUntil: "domcontentloaded", timeout: 45000 });
     productOk = resp.status() === 200;
     bodyText = await page.evaluate(() => document.body.innerText);
     productOk = productOk && !bodyText.includes("Produit introuvable");
@@ -92,7 +97,14 @@ try {
   await page.click('button[type="submit"]');
   await page
     .waitForFunction(() => document.body.innerText.includes("requis"), { timeout: 8000 })
-    .catch(() => {});
+    .catch(async () => {
+      // Hydration may still be settling — retry once.
+      await new Promise((r) => setTimeout(r, 2000));
+      await page.click('button[type="submit"]').catch(() => {});
+      await page
+        .waitForFunction(() => document.body.innerText.includes("requis"), { timeout: 8000 })
+        .catch(() => {});
+    });
   const validationText = await page.evaluate(() => document.body.innerText);
   const validationBlocked =
     validationText.includes("requis") &&
