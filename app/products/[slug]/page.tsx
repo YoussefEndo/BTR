@@ -6,6 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { OrderForm } from "@/components/order/OrderForm";
 import { getProductWithOptions } from "@/lib/queries/products";
+import { translate } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n-server";
 
 // ISR: catalog data is public and cache-safe; admin edits appear within 60s.
 export const revalidate = 60;
@@ -32,6 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
+  const locale = await getLocale();
   const { slug } = await params;
   const data = await getProductWithOptions(slug);
   if (!data) notFound();
@@ -40,14 +43,14 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
+      <Navbar locale={locale} />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-stone-400">
-          <Link href="/" className="hover:text-brand-700">Accueil</Link>
+          <Link href="/" className="hover:text-brand-700">{translate(locale, "home")}</Link>
           <span className="mx-2">/</span>
-          <Link href="/products" className="hover:text-brand-700">Produits</Link>
+          <Link href="/products" className="hover:text-brand-700">{translate(locale, "products")}</Link>
           <span className="mx-2">/</span>
           <span className="text-stone-600">{product.name}</span>
         </nav>
@@ -60,13 +63,14 @@ export default async function ProductPage({ params }: Props) {
                 {product.name}
               </h1>
               <p className="mt-2 text-sm text-stone-400">
-                Fabrication sur mesure — devis gratuit
+                {translate(locale, "customManufacturing")}
               </p>
             </div>
             <OrderForm
               product={product}
               images={images}
               options={options}
+              locale={locale}
             />
           </div>
 
@@ -74,24 +78,22 @@ export default async function ProductPage({ params }: Props) {
           <aside className="order-1 lg:order-2">
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 lg:sticky lg:top-24">
               <h2 className="font-semibold text-stone-900">
-                Commander ce meuble
+                {translate(locale, "orderThisFurniture")}
               </h2>
               <p className="mt-2 text-sm text-stone-500">
-                Configurez votre produit, laissez vos coordonnées et envoyez
-                votre demande directement via WhatsApp. Notre équipe vous
-                répond avec un devis personnalisé.
+                {translate(locale, "orderDescription")}
               </p>
               <ul className="mt-4 space-y-2 text-sm text-stone-600">
-                <li>✓ Dimensions à la demande</li>
-                <li>✓ Couleur et finition au choix</li>
-                <li>✓ Réponse rapide par WhatsApp</li>
+                <li>✓ {translate(locale, "dimensionsOnRequest")}</li>
+                <li>✓ {translate(locale, "colorFinishChoice")}</li>
+                <li>✓ {translate(locale, "quickWhatsAppReply")}</li>
               </ul>
             </div>
           </aside>
         </div>
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

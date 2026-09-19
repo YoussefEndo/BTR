@@ -3,6 +3,8 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { LocaleToggle } from "@/components/layout/LocaleToggle";
+import { translate } from "@/lib/i18n";
 
 function LoginForm() {
   const router = useRouter();
@@ -30,7 +32,7 @@ function LoginForm() {
     });
 
     if (error) {
-      setError("Email ou mot de passe incorrect.");
+      setError(translate("ar", "incorrectLogin"));
       setLoading(false);
       return;
     }
@@ -41,11 +43,11 @@ function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-      <h1 className="text-2xl font-semibold text-stone-900">Connexion admin</h1>
+      <h1 className="text-2xl font-semibold text-stone-900">{translate("ar", "adminLogin")}</h1>
 
       <div>
         <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-stone-700">
-          Email
+          {translate("ar", "email")}
         </label>
         <input
           id="email"
@@ -59,7 +61,7 @@ function LoginForm() {
 
       <div>
         <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-stone-700">
-          Mot de passe
+          {translate("ar", "password")}
         </label>
         <input
           id="password"
@@ -82,7 +84,7 @@ function LoginForm() {
         disabled={loading}
         className="w-full rounded-full bg-brand-800 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
       >
-        {loading ? "Connexion…" : "Se connecter"}
+        {loading ? "جارٍ الدخول…" : translate("ar", "signIn")}
       </button>
     </form>
   );
@@ -90,7 +92,8 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-stone-50 px-4">
+      <div className="absolute right-4 top-4"><LocaleToggle /></div>
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>

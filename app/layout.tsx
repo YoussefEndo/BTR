@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { getLocale } from "@/lib/i18n-server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,14 +36,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="fr"
+      lang={locale}
+      dir={locale === "ar" ? "rtl" : "ltr"}
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${displaySerif.variable} h-full antialiased`}
     >

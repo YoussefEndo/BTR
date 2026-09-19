@@ -4,12 +4,14 @@ import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { LocaleToggle } from "@/components/layout/LocaleToggle";
+import { translate } from "@/lib/i18n";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/products", label: "Produits" },
-  { href: "/admin/categories", label: "Catégories" },
-  { href: "/admin/orders", label: "Commandes" },
+  { href: "/admin", label: "dashboard" as const },
+  { href: "/admin/products", label: "products" as const },
+  { href: "/admin/categories", label: "categories" as const },
+  { href: "/admin/orders", label: "orders" as const },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -31,7 +33,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className="flex w-56 flex-col border-r border-stone-200 bg-white">
         <div className="border-b border-stone-200 p-4">
           <Link href="/" className="font-semibold text-brand-900">
-            BTR Immo Déco — Admin
+            BTR Immo Déco — {translate("ar", "admin")}
           </Link>
         </div>
         <nav className="flex-1 space-y-1 p-3">
@@ -50,7 +52,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     : "text-stone-600 hover:bg-stone-100"
                 }`}
               >
-                {item.label}
+                {translate("ar", item.label)}
               </Link>
             );
           })}
@@ -61,12 +63,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             onClick={handleLogout}
             className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-stone-600 hover:bg-stone-100"
           >
-            Déconnexion
+            {translate("ar", "logout")}
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-x-auto p-6">{children}</main>
+      <main className="flex-1 overflow-x-auto p-6">
+        <div className="mb-4 flex justify-end"><LocaleToggle /></div>
+        {children}
+      </main>
     </div>
   );
 }

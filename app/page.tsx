@@ -7,6 +7,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveProducts } from "@/lib/queries/products";
+import { translate } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n-server";
 
 // ISR: catalog data is public and cache-safe; admin edits appear within 60s.
 export const revalidate = 60;
@@ -49,6 +51,22 @@ const STEPS = [
 ] as const;
 
 export default async function Home() {
+  const locale = await getLocale();
+  const valueProps = locale === "ar"
+    ? [
+        { title: translate(locale, "madeToMeasure"), text: translate(locale, "madeToMeasureText") },
+        { title: translate(locale, "freeQuote"), text: translate(locale, "freeQuoteText") },
+        { title: translate(locale, "chosenMaterials"), text: translate(locale, "chosenMaterialsText") },
+        { title: translate(locale, "directFollowUp"), text: translate(locale, "directFollowUpText") },
+      ]
+    : VALUE_PROPS;
+  const steps = locale === "ar"
+    ? [
+        { number: "01", title: translate(locale, "chooseConfigure"), text: translate(locale, "chooseConfigureText") },
+        { number: "02", title: translate(locale, "sendRequest"), text: translate(locale, "sendRequestText") },
+        { number: "03", title: translate(locale, "receiveQuote"), text: translate(locale, "receiveQuoteText") },
+      ]
+    : STEPS;
   const [categories, products] = await Promise.all([
     getActiveCategories(),
     getActiveProducts(),
@@ -57,7 +75,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
+      <Navbar locale={locale} />
 
       <main className="flex-1">
         {/* ------------------------------ Hero ------------------------------ */}
@@ -76,17 +94,16 @@ export default async function Home() {
           <div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
             <p className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/90 backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-              Mobilier sur mesure · Casablanca
+              {translate(locale, "customFurnitureCasablanca")}
             </p>
 
             <h1 className="font-display mt-6 max-w-3xl text-5xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Votre intérieur, conçu selon{" "}
-              <span className="italic text-accent-300">vos dimensions.</span>
+              {translate(locale, "interiorDesigned")} {" "}
+              <span className="italic text-accent-300">{translate(locale, "yourDimensions")}</span>
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
-              Tables, placards, meubles TV, bureaux et cuisines fabriqués sur
-              mesure. Configurez en ligne, recevez votre devis sur WhatsApp.
+              {translate(locale, "heroDescription")}
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -94,7 +111,7 @@ export default async function Home() {
                 href="/products"
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-brand-900 shadow-lg transition-all hover:bg-brand-100 hover:shadow-xl"
               >
-                Découvrir nos produits
+                {translate(locale, "discoverProducts")}
                 <span
                   aria-hidden
                   className="transition-transform group-hover:translate-x-0.5"
@@ -108,13 +125,13 @@ export default async function Home() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/5 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/60 hover:bg-white/15"
               >
-                Devis sur WhatsApp
+                {translate(locale, "whatsappQuote")}
               </a>
             </div>
 
             {/* Value props pinned to the hero base */}
             <dl className="mt-16 grid max-w-3xl grid-cols-1 gap-x-10 gap-y-6 border-t border-white/15 pt-8 sm:grid-cols-3">
-              {VALUE_PROPS.slice(0, 3).map((item) => (
+              {valueProps.slice(0, 3).map((item) => (
                 <div key={item.title}>
                   <dt className="font-display text-xl font-semibold text-accent-300">
                     {item.title}
@@ -134,21 +151,20 @@ export default async function Home() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent-400">
-                  Nos univers
+                  {translate(locale, "ourWorlds")}
                 </p>
                 <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                  Explorez nos catégories
+                  {translate(locale, "exploreCategories")}
                 </h2>
                 <p className="mt-2 max-w-lg text-white/60">
-                  Chaque pièce est fabriquée sur mesure selon vos besoins — du
-                  salon à la cuisine.
+                  {translate(locale, "categoriesDescription")}
                 </p>
               </div>
               <Link
                 href="/products"
                 className="group inline-flex items-center gap-1.5 text-sm font-medium text-accent-300 hover:text-accent-400"
               >
-                Tout le catalogue
+                {translate(locale, "fullCatalog")}
                 <span
                   aria-hidden
                   className="transition-transform group-hover:translate-x-0.5"
@@ -160,7 +176,7 @@ export default async function Home() {
 
             <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {categories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
+                <CategoryCard key={category.id} category={category} locale={locale} />
               ))}
             </div>
           </div>
@@ -172,17 +188,17 @@ export default async function Home() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-500">
-                  Sélection
+                  {translate(locale, "selection")}
                 </p>
                 <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
-                  Produits populaires
+                  {translate(locale, "popularProducts")}
                 </h2>
               </div>
               <Link
                 href="/products"
                 className="group inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-900"
               >
-                Tout voir
+                {translate(locale, "seeAll")}
                 <span
                   aria-hidden
                   className="transition-transform group-hover:translate-x-0.5"
@@ -193,7 +209,7 @@ export default async function Home() {
             </div>
             <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} locale={locale} />
               ))}
             </div>
           </div>
@@ -204,14 +220,14 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-500">
-                Simple & rapide
+                {translate(locale, "simpleFast")}
               </p>
               <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
-                Comment ça marche ?
+                {translate(locale, "howItWorks")}
               </h2>
             </div>
             <ol className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
-              {STEPS.map((step, i) => (
+              {steps.map((step, i) => (
                 <li
                   key={step.number}
                   className={
@@ -240,14 +256,14 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-500">
-                La différence BTR
+                {translate(locale, "btrDifference")}
               </p>
               <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
-                Pourquoi nous choisir ?
+                {translate(locale, "whyChooseUs")}
               </h2>
             </div>
             <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {VALUE_PROPS.map((item) => (
+              {valueProps.map((item) => (
                 <div
                   key={item.title}
                   className="group rounded-2xl border border-stone-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg"
@@ -274,11 +290,10 @@ export default async function Home() {
           />
           <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
             <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-              Vous avez un projet ?
+              {translate(locale, "projectQuestion")}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-lg text-white/70">
-              Parlez-nous de votre idée — nous vous répondons rapidement avec
-              un devis gratuit.
+              {translate(locale, "projectDescription")}
             </p>
             <a
               href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ""}`}
@@ -286,14 +301,14 @@ export default async function Home() {
               rel="noopener noreferrer"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent-400 px-8 py-3.5 text-sm font-semibold text-brand-950 shadow-lg transition-all hover:bg-accent-300 hover:shadow-xl"
             >
-              Nous contacter sur WhatsApp
+              {translate(locale, "contactWhatsApp")}
               <span aria-hidden>→</span>
             </a>
           </div>
         </section>
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

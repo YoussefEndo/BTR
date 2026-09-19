@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { ProductWithCategory } from "@/types/database";
+import { translate, type Locale } from "@/lib/i18n";
 
-export function ProductCard({ product }: { product: ProductWithCategory }) {
+export function ProductCard({ product, locale }: { product: ProductWithCategory; locale: Locale }) {
   return (
     <Link
       href={`/products/${product.slug}`}
@@ -20,7 +21,7 @@ export function ProductCard({ product }: { product: ProductWithCategory }) {
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-stone-400">
-            Pas d&apos;image
+            {translate(locale, "noImage")}
           </div>
         )}
         {product.categories && (
@@ -37,7 +38,7 @@ export function ProductCard({ product }: { product: ProductWithCategory }) {
           {product.description}
         </p>
         <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700">
-          Voir détails
+          {translate(locale, "seeDetails")}
           <span
             aria-hidden
             className="transition-transform duration-300 group-hover:translate-x-1"

@@ -6,6 +6,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveProducts } from "@/lib/queries/products";
+import { translate } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n-server";
 
 // ISR: catalog data is public and cache-safe; admin edits appear within 60s.
 export const revalidate = 60;
@@ -21,6 +23,7 @@ interface Props {
 }
 
 export default async function ProductsPage({ searchParams }: Props) {
+  const locale = await getLocale();
   const { categorie } = await searchParams;
 
   const categories = await getActiveCategories();
@@ -29,15 +32,14 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
+      <Navbar locale={locale} />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6">
         <h1 className="text-3xl font-semibold tracking-tight text-stone-900">
-          Nos produits
+          {translate(locale, "ourProducts")}
         </h1>
         <p className="mt-2 text-stone-500">
-          Tout est fabriqué sur mesure. Sélectionnez un produit pour configurer
-          vos dimensions et demander un devis.
+          {translate(locale, "productsDescription")}
         </p>
 
         {/* Category filter */}
@@ -50,7 +52,7 @@ export default async function ProductsPage({ searchParams }: Props) {
                 : "border-stone-200 bg-white text-stone-600 hover:border-brand-300"
             }`}
           >
-            Tous
+            {translate(locale, "all")}
           </Link>
           {categories.map((category) => (
             <Link
@@ -69,18 +71,18 @@ export default async function ProductsPage({ searchParams }: Props) {
 
         {products.length === 0 ? (
           <div className="mt-12 rounded-2xl border border-dashed border-stone-300 p-12 text-center">
-            <p className="font-medium text-stone-900">Aucun produit trouvé.</p>
+            <p className="font-medium text-stone-900">{translate(locale, "noProducts")}</p>
           </div>
         ) : (
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} locale={locale} />
             ))}
           </div>
         )}
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

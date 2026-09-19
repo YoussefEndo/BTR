@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { LocaleToggle } from "@/components/layout/LocaleToggle";
+import { translate, type Locale } from "@/lib/i18n";
 
-const links = [
-  { href: "/", label: "Accueil" },
-  { href: "/#categories", label: "Catégories" },
-  { href: "/products", label: "Produits" },
-];
-
-export function Navbar() {
+export function Navbar({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
+  const links = [
+    { href: "/", label: translate(locale, "home") },
+    { href: "/#categories", label: translate(locale, "categories") },
+    { href: "/products", label: translate(locale, "products") },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/90 backdrop-blur">
@@ -22,7 +23,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop */}
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -32,11 +33,12 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          <LocaleToggle locale={locale} />
           <Link
             href="/products"
             className="rounded-full bg-brand-800 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700"
           >
-            Découvrir
+            {translate(locale, "discover")}
           </Link>
         </nav>
 
@@ -70,12 +72,13 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          <div className="px-3 py-2.5"><LocaleToggle locale={locale} /></div>
           <Link
             href="/products"
             onClick={() => setOpen(false)}
             className="mt-2 block rounded-full bg-brand-800 px-5 py-2.5 text-center text-sm font-medium text-white"
           >
-            Découvrir
+            {translate(locale, "discover")}
           </Link>
         </nav>
       )}

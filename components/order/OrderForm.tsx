@@ -7,16 +7,18 @@ import { createOrder } from "@/app/actions/orders";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { validateCustomerFields, validateOptionValue } from "@/lib/validation/order";
 import type { OptionValue, Product, ProductImage, ProductOption } from "@/types/database";
+import { translate, type Locale } from "@/lib/i18n";
 
 interface Props {
   product: Product;
   images: ProductImage[];
   options: (ProductOption & { values: OptionValue[] })[];
+  locale: Locale;
 }
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
-export function OrderForm({ product, images, options }: Props) {
+export function OrderForm({ product, images, options, locale }: Props) {
   const [gallery] = useState(images);
   const [activeImage, setActiveImage] = useState(
     product.main_image_url ?? images[0]?.image_url ?? null
@@ -101,18 +103,17 @@ export function OrderForm({ product, images, options }: Props) {
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
         <p className="text-lg font-semibold text-green-800">
-          Votre demande a été enregistrée.
+          {translate(locale, "requestSaved")}
         </p>
         <p className="mt-2 text-sm text-green-700">
-          Si WhatsApp ne s&apos;est pas ouvert automatiquement, vérifiez que
-          votre navigateur autorise les pop-ups.
+          {translate(locale, "whatsappPopup")}
         </p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
           className="mt-6 rounded-full border border-green-300 px-5 py-2 text-sm font-medium text-green-800 hover:bg-green-100"
         >
-          Faire une autre demande
+          {translate(locale, "anotherRequest")}
         </button>
       </div>
     );
@@ -134,7 +135,7 @@ export function OrderForm({ product, images, options }: Props) {
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-stone-400">
-              Pas d&apos;image
+              {translate(locale, "noImage")}
             </div>
           )}
         </div>
@@ -158,7 +159,7 @@ export function OrderForm({ product, images, options }: Props) {
 
       {/* Description */}
       <div>
-        <h2 className="text-lg font-semibold text-stone-900">Description</h2>
+        <h2 className="text-lg font-semibold text-stone-900">{translate(locale, "description")}</h2>
         <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-stone-600">
           {product.description}
         </p>
@@ -168,10 +169,10 @@ export function OrderForm({ product, images, options }: Props) {
       {options.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-stone-900">
-            Personnalisation
+            {translate(locale, "customization")}
           </h2>
           <p className="mt-1 text-sm text-stone-500">
-            Renseignez vos dimensions et préférences.
+            {translate(locale, "customizationDescription")}
           </p>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {options.map((option) => (
@@ -196,7 +197,7 @@ export function OrderForm({ product, images, options }: Props) {
                     onChange={(e) => setOption(option.id, e.target.value)}
                     className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
                   >
-                    <option value="">Choisir…</option>
+                    <option value="">{translate(locale, "choose")}</option>
                     {option.values.map((v) => (
                       <option key={v.id} value={v.value}>
                         {v.value}
@@ -230,12 +231,12 @@ export function OrderForm({ product, images, options }: Props) {
       {/* Customer information */}
       <div>
         <h2 className="text-lg font-semibold text-stone-900">
-          Vos informations
+          {translate(locale, "yourInformation")}
         </h2>
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="customer_name" className="mb-1.5 block text-sm font-medium text-stone-700">
-              Nom <span className="text-red-500">*</span>
+              {translate(locale, "name")} <span className="text-red-500">*</span>
             </label>
             <input
               id="customer_name"
@@ -248,7 +249,7 @@ export function OrderForm({ product, images, options }: Props) {
           </div>
           <div>
             <label htmlFor="customer_phone" className="mb-1.5 block text-sm font-medium text-stone-700">
-              Téléphone <span className="text-red-500">*</span>
+              {translate(locale, "phone")} <span className="text-red-500">*</span>
             </label>
             <input
               id="customer_phone"
@@ -262,7 +263,7 @@ export function OrderForm({ product, images, options }: Props) {
           </div>
           <div>
             <label htmlFor="customer_city" className="mb-1.5 block text-sm font-medium text-stone-700">
-              Ville <span className="text-red-500">*</span>
+              {translate(locale, "city")} <span className="text-red-500">*</span>
             </label>
             <input
               id="customer_city"
@@ -275,7 +276,7 @@ export function OrderForm({ product, images, options }: Props) {
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="customer_note" className="mb-1.5 block text-sm font-medium text-stone-700">
-              Note
+              {translate(locale, "note")}
             </label>
             <textarea
               id="customer_note"
@@ -302,12 +303,12 @@ export function OrderForm({ product, images, options }: Props) {
           className="w-full rounded-full bg-brand-800 px-6 py-4 text-base font-semibold text-white shadow-lg transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === "submitting"
-            ? "Envoi en cours…"
-            : "Envoyer la demande sur WhatsApp"}
+            ? translate(locale, "sending")
+            : translate(locale, "sendWhatsAppRequest")}
         </button>
       </div>
       <p className="text-center text-xs text-stone-400">
-        Prix sur demande — configuration personnalisée sans engagement.
+        {translate(locale, "onRequest")}
       </p>
     </form>
   );

@@ -6,6 +6,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveProducts } from "@/lib/queries/products";
 import { ProductCard } from "@/components/products/ProductCard";
+import { translate } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n-server";
 
 // ISR: catalog data is public and cache-safe; admin edits appear within 60s.
 export const revalidate = 60;
@@ -22,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params }: Props) {
+  const locale = await getLocale();
   const { slug } = await params;
 
   const categories = await getActiveCategories();
@@ -30,16 +33,16 @@ export default async function CategoryPage({ params }: Props) {
   if (!category) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Navbar />
+        <Navbar locale={locale} />
         <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
           <h1 className="font-display text-3xl font-semibold text-stone-900">
-            Catégorie introuvable
+            {translate(locale, "categoryNotFound")}
           </h1>
           <p className="mt-2 text-stone-500">
-            Cette catégorie n&apos;existe pas ou n&apos;est plus disponible.
+            {translate(locale, "categoryUnavailable")}
           </p>
         </main>
-        <Footer />
+        <Footer locale={locale} />
       </div>
     );
   }
@@ -48,7 +51,7 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
+      <Navbar locale={locale} />
 
       <main className="flex-1">
         {/* Hero banner with the category photo */}
@@ -66,7 +69,7 @@ export default async function CategoryPage({ params }: Props) {
           <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/40 to-brand-950/10" />
           <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-24 sm:px-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent-300">
-              Catégorie
+              {translate(locale, "category")}
             </p>
             <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
               {category.name}
@@ -83,23 +86,23 @@ export default async function CategoryPage({ params }: Props) {
           {products.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-12 text-center">
               <p className="font-medium text-stone-900">
-                Aucun produit trouvé.
+                {translate(locale, "noProducts")}
               </p>
               <p className="mt-1 text-sm text-stone-500">
-                Revenez bientôt, de nouvelles réalisations arrivent.
+                {translate(locale, "comingSoon")}
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} locale={locale} />
               ))}
             </div>
           )}
         </section>
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

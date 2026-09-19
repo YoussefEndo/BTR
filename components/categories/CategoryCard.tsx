@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { Category } from "@/types/database";
+import { translate, type Locale } from "@/lib/i18n";
 
-export function CategoryCard({ category }: { category: Category }) {
+export function CategoryCard({ category, locale }: { category: Category; locale: Locale }) {
   return (
     <Link
       href={`/categories/${category.slug}`}
@@ -32,7 +33,7 @@ export function CategoryCard({ category }: { category: Category }) {
           </p>
         )}
         <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent-300">
-          Découvrir
+          {translate(locale, "discoverCategory")}
           <span
             aria-hidden
             className="transition-transform duration-300 group-hover:translate-x-1"
